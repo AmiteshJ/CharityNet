@@ -1,0 +1,97 @@
+.landing-page {
+  height: 100vh;
+  width: 100vw;
+  background-color: #00d3e0; /* Solid plain cyan */
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.pixel-blend-logo {
+  width: 240px;
+  mix-blend-mode: multiply; /* Seamless blending */
+}
+
+.header-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 60px;
+  align-items: center;
+  z-index: 10;
+}
+
+.auth-links {
+  color: white;
+  font-weight: bold;
+  font-size: 1.3rem;
+  display: flex;
+  gap: 40px;
+}
+
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 5;
+}
+
+.main-title {
+  color: white;
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 40px;
+}
+
+.pill-button {
+  background-color: black;
+  color: white;
+  padding: 18px 70px;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+/* Scenery Logic */
+.scenery {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 250px;
+}
+
+.pole {
+  position: absolute;
+  width: 14px;
+  height: 200px;
+  background: #111;
+  bottom: 0;
+  z-index: 2;
+}
+
+/* Placed at 22% and 78% (which is 1000px scale 220 and 780) */
+.p-left { left: 22%; }
+.p-right { right: 22%; }
+
+.sagging-wires {
+  position: absolute;
+  bottom: 110px; /* Aligned with the top section of the towers */
+  width: 100%;
+  height: 140px;
+  z-index: 1;
+}
+
+.wire-path {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
