@@ -8,15 +8,9 @@ const Profile = ({ onBack }) => {
   const [userData, setUserData] = useState({});
   const [activeField, setActiveField] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [locLoading, setLocLoading] = useState(false); // Track location update status
 
-  const fields = [
-    "Full Name",
-    "Email ID",
-    "Phone Number",
-    "City Area",
-    "User Type",
-    "Gender"
-  ];
+  const fields = ["Full Name", "Email ID", "Phone Number", "City Area", "User Type", "Gender"];
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -25,7 +19,6 @@ const Profile = ({ onBack }) => {
         onBack();
         return;
       }
-
       const userRef = ref(rtdb, `users/${user.uid}`);
       onValue(userRef, (snapshot) => {
         const data = snapshot.val() || {};
@@ -36,13 +29,51 @@ const Profile = ({ onBack }) => {
         setLoading(false);
       });
     });
-
     return () => unsubscribe();
   }, [onBack]);
 
+  // Logic to get and save Geolocation
+  const handleUpdateLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setLocLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        if (!auth.currentUser) return;
+
+        try {
+          const userRef = ref(rtdb, `users/${auth.currentUser.uid}`);
+          // Update the specific Coordinates node needed for NGO matching
+          await update(userRef, {
+            Coordinates: {
+              lat: latitude,
+              lon: longitude
+            }
+          });
+          alert("Location updated successfully!");
+        } catch (err) {
+          console.error("Firebase update failed:", err);
+          alert("Failed to save location to database.");
+        } finally {
+          setLocLoading(false);
+        }
+      },
+      (error) => {
+        setLocLoading(false);
+        alert("Error: " + error.message + ". Please enable location permissions.");
+      },
+      { enableHighAccuracy: true }
+    );
+  };
+
   const handleSaveField = async (label, value) => {
     if (!auth.currentUser) return;
-
     try {
       const userRef = ref(rtdb, `users/${auth.currentUser.uid}`);
       await update(userRef, { [label]: value });
@@ -58,7 +89,6 @@ const Profile = ({ onBack }) => {
   return (
     <div className="profile-page-wrapper">
       <div className="profile-container">
-
         <div className="nav-header">
           <Home className="icon-button" onClick={onBack} />
           <div className="profile-avatar-wrapper">
@@ -70,39 +100,41 @@ const Profile = ({ onBack }) => {
         <div className="main-card">
           <div className="grid-layout">
             <div className="column-container">
-
               {fields.map(label => (
                 <div key={label} className="field-container">
                   <p className="field-label">{label}</p>
-
                   {activeField === label ? (
                     <input
                       autoFocus
                       className="field-input"
                       value={userData[label] || ""}
-                      onChange={(e) =>
-                        setUserData(prev => ({ ...prev, [label]: e.target.value }))
-                      }
+                      onChange={(e) => setUserData(prev => ({ ...prev, [label]: e.target.value }))}
                       onBlur={(e) => handleSaveField(label, e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && handleSaveField(label, e.target.value)
-                      }
+                      onKeyDown={(e) => e.key === "Enter" && handleSaveField(label, e.target.value)}
                     />
                   ) : (
-                    <p
-                      className="field-value"
-                      onClick={() => setActiveField(label)}
-                    >
+                    <p className="field-value" onClick={() => setActiveField(label)}>
                       {userData[label] || "Click to edit"}
                     </p>
                   )}
                 </div>
               ))}
 
-              <button className="location-btn">
-                <MapPin size={16} /> Update Location
+              {/* Connected Button to Logic */}
+              <button 
+                className={`location-btn ${locLoading ? 'loading' : ''}`} 
+                onClick={handleUpdateLocation}
+                disabled={locLoading}
+              >
+                <MapPin size={16} /> 
+                {locLoading ? "Fetching..." : "Update Location"}
               </button>
-
+              
+              {userData.Coordinates && (
+                <p className="coords-display">
+                  Saved: {userData.Coordinates.lat.toFixed(4)}, {userData.Coordinates.lon.toFixed(4)}
+                </p>
+              )}
             </div>
           </div>
         </div>
