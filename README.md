@@ -59,6 +59,7 @@ cd CharityNet
 Setup Environment Variables: Create a .env file in the root directory and add your Firebase credentials:
 
 Code snippet
+
 VITE_FIREBASE_API_KEY="AIzaSyBlP91iQoSxaWxk-S1WbxrT7ic5bu4vIoc"
 VITE_FIREBASE_AUTH_DOMAIN="charitynet-6ebdc.firebaseapp.com"
 VITE_FIREBASE_DATABASE_URL="https://charitynet-6ebdc-default-rtdb.firebaseio.com"
@@ -70,5 +71,7 @@ VITE_FIREBASE_MEASUREMENT_ID="G-JDBJGKRLC8"
 Run the Project:
 
 Bash
+
 npm install
+
 npm run dev
